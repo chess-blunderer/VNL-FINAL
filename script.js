@@ -14,7 +14,7 @@ const hometownBox = document.getElementById("hometown");
 
 const academicsBox = document.getElementById("academics");
 
-const enrollmentBox = document.getElementById("enrollment");
+const college = document.getElementById("college");
 
 const mobileBox = document.getElementById("mobile");
 
@@ -35,7 +35,7 @@ const COLUMNS = {
 
   hometown: "Native place",
 
-  enrollment: "Enrollment No",
+  college: "College",
 
   uan: "UAN No",
 
@@ -112,7 +112,7 @@ function findMatches(query) {
 
     const hometown = clean(contact[COLUMNS.hometown]);
 
-    const enrollment = clean(contact[COLUMNS.enrollment]);
+    const college = clean(contact[COLUMNS.college]);
 
     const uan = clean(contact[COLUMNS.uan]);
 
@@ -123,7 +123,7 @@ function findMatches(query) {
     return (
       name.includes(query) ||
       hometown.includes(query) ||
-      enrollment.includes(query) ||
+      college.includes(query) ||
       uan.includes(query) ||
       mobile.includes(query) ||
       email.includes(query)
@@ -363,7 +363,7 @@ function displayContact(contact) {
        ENROLLMENT
        ===================================== */
 
-  enrollmentBox.textContent = contact[COLUMNS.enrollment] || "N/A";
+  college.textContent = contact[COLUMNS.college] || "N/A";
 
   /* =====================================
        MOBILE
