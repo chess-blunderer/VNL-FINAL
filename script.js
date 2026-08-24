@@ -178,7 +178,7 @@ function showSuggestions() {
        Maximum 8 visible suggestions.
     */
 
-  currentSuggestions = currentSuggestions.slice(0, 8);
+  currentSuggestions = currentSuggestions.slice(0, 20);
 
   /*
        Create suggestions.
