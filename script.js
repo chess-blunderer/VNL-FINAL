@@ -10,6 +10,8 @@ const table = document.getElementById("infoTable");
 
 const nameBox = document.getElementById("name");
 
+const roomBox = document.getElementById("room");
+
 const hometownBox = document.getElementById("hometown");
 
 const academicsBox = document.getElementById("academics");
@@ -32,6 +34,8 @@ let contacts = [];
 
 const COLUMNS = {
   name: "Student Name",
+
+  room: "Room No",
 
   hometown: "Native place",
 
@@ -97,6 +101,24 @@ function clean(value) {
 }
 
 /* =========================================
+   NORMALIZE ROOM NUMBER
+   ========================================= */
+
+/*
+   M-508  becomes M508
+   M 508  becomes M508
+   M508   becomes M508
+
+   This allows flexible room searches.
+*/
+
+function normalizeRoom(value) {
+  return String(value ?? "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "");
+}
+
+/* =========================================
    FIND MATCHES
    ========================================= */
 
@@ -106,6 +128,8 @@ function findMatches(query) {
   if (query === "") {
     return [];
   }
+
+  const normalizedQuery = normalizeRoom(query);
 
   return contacts.filter(function (contact) {
     const name = clean(contact[COLUMNS.name]);
@@ -120,8 +144,21 @@ function findMatches(query) {
 
     const email = clean(contact[COLUMNS.email]);
 
+    /* =====================================
+       ROOM NUMBER SEARCH
+       ===================================== */
+
+    const room = normalizeRoom(contact[COLUMNS.room]);
+
+    const roomMatch = normalizedQuery !== "" && room.includes(normalizedQuery);
+
+    /* =====================================
+       OTHER SEARCHES
+       ===================================== */
+
     return (
       name.includes(query) ||
+      roomMatch ||
       hometown.includes(query) ||
       college.includes(query) ||
       uan.includes(query) ||
@@ -175,7 +212,7 @@ function showSuggestions() {
   }
 
   /*
-       Maximum 8 visible suggestions.
+       Maximum 20 visible suggestions.
     */
 
   currentSuggestions = currentSuggestions.slice(0, 20);
@@ -190,8 +227,8 @@ function showSuggestions() {
     suggestion.className = "suggestion";
 
     /*
-               Student name
-            */
+       Student name
+    */
 
     const studentName = document.createElement("div");
 
@@ -200,8 +237,9 @@ function showSuggestions() {
     studentName.textContent = contact[COLUMNS.name] || "Unknown";
 
     /*
-               Extra information
-            */
+       Extra information
+       Now includes room number.
+    */
 
     const details = document.createElement("div");
 
@@ -211,25 +249,27 @@ function showSuggestions() {
 
     const course = contact[COLUMNS.course] || "";
 
-    details.textContent = hometown + (course ? "  •  " + course : "");
+    const room = contact[COLUMNS.room] || "Room not assigned";
+
+    details.textContent =
+      room + "  •  " + hometown + (course ? "  •  " + course : "");
 
     /*
-               Add elements.
-            */
+       Add elements.
+    */
 
     suggestion.appendChild(studentName);
 
     suggestion.appendChild(details);
 
     /*
-               Mouse click.
-            */
+       Mouse click.
+    */
 
     suggestion.addEventListener("mousedown", function (event) {
       /*
-                       Keeps click selection
-                       reliable.
-                    */
+         Keeps click selection reliable.
+      */
 
       event.preventDefault();
 
@@ -239,8 +279,8 @@ function showSuggestions() {
     });
 
     /*
-               Mouse hover.
-            */
+       Mouse hover.
+    */
 
     suggestion.addEventListener("mouseenter", function () {
       selectedIndex = index;
@@ -340,6 +380,12 @@ function displayContact(contact) {
   nameBox.textContent = contact[COLUMNS.name] || "N/A";
 
   /* =====================================
+       ROOM NUMBER
+       ===================================== */
+
+  roomBox.textContent = contact[COLUMNS.room] || "N/A";
+
+  /* =====================================
        HOMETOWN
        ===================================== */
 
@@ -360,7 +406,7 @@ function displayContact(contact) {
   }
 
   /* =====================================
-       ENROLLMENT
+       COLLEGE
        ===================================== */
 
   college.textContent = contact[COLUMNS.college] || "N/A";
@@ -414,8 +460,8 @@ searchBar.addEventListener("input", function () {
 
 searchBar.addEventListener("keydown", function (event) {
   /* =================================
-           DOWN ARROW
-           ================================= */
+       DOWN ARROW
+       ================================= */
 
   if (event.key === "ArrowDown" && currentSuggestions.length > 0) {
     event.preventDefault();
@@ -428,10 +474,10 @@ searchBar.addEventListener("keydown", function (event) {
 
     updateSelection();
   } else if (event.key === "ArrowUp" && currentSuggestions.length > 0) {
+    /* =================================
+       UP ARROW
+       ================================= */
 
-  /* =================================
-           UP ARROW
-           ================================= */
     event.preventDefault();
 
     if (selectedIndex > 0) {
@@ -442,10 +488,10 @@ searchBar.addEventListener("keydown", function (event) {
 
     updateSelection();
   } else if (event.key === "Enter") {
+    /* =================================
+       ENTER
+       ================================= */
 
-  /* =================================
-           ENTER
-           ================================= */
     event.preventDefault();
 
     if (selectedIndex >= 0 && currentSuggestions.length > 0) {
@@ -454,10 +500,10 @@ searchBar.addEventListener("keydown", function (event) {
       performSearch();
     }
   } else if (event.key === "Escape") {
+    /* =================================
+       ESCAPE
+       ================================= */
 
-  /* =================================
-           ESCAPE
-           ================================= */
     hideSuggestions();
   }
 });
@@ -482,6 +528,36 @@ function performSearch() {
   }
 
   /*
+       Check for exact room number matches.
+    */
+
+  const normalizedQuery = normalizeRoom(query);
+
+  const exactRoomMatches = matches.filter(function (contact) {
+    return (
+      normalizedQuery !== "" &&
+      normalizeRoom(contact[COLUMNS.room]) === normalizedQuery
+    );
+  });
+
+  /*
+       If multiple students have the same
+       room number, keep their suggestions
+       visible so the correct student can
+       be selected.
+    */
+
+  if (exactRoomMatches.length > 1) {
+    currentSuggestions = exactRoomMatches.slice(0, 30);
+
+    selectedIndex = 0;
+
+    updateSelection();
+
+    return;
+  }
+
+  /*
        Prefer an exact match.
     */
 
@@ -490,9 +566,11 @@ function performSearch() {
 
     return (
       clean(contact[COLUMNS.name]) === search ||
-      clean(contact[COLUMNS.enrollment]) === search ||
+      clean(contact[COLUMNS.college]) === search ||
       clean(contact[COLUMNS.uan]) === search ||
-      clean(contact[COLUMNS.mobile]) === search
+      clean(contact[COLUMNS.mobile]) === search ||
+      (normalizedQuery !== "" &&
+        normalizeRoom(contact[COLUMNS.room]) === normalizedQuery)
     );
   });
 
@@ -519,4 +597,41 @@ document.addEventListener("mousedown", function (event) {
   ) {
     hideSuggestions();
   }
+});
+
+/* =====================================
+   SWARIZZ THREE-STAGE INTRO
+===================================== */
+
+document.body.classList.add("website-loading");
+
+window.addEventListener("load", function () {
+  const stageOne = document.getElementById("stage-one");
+  const stageTwo = document.getElementById("stage-two");
+  const intro = document.getElementById("intro-screen");
+
+  // Show the first stage
+  stageOne.classList.add("active");
+
+  // After 2.5 seconds, fade out SWARIZZ PRESENTS
+  setTimeout(function () {
+    stageOne.classList.remove("active");
+
+    // Show THE DIRECTORY after the first stage fades
+    setTimeout(function () {
+      stageTwo.classList.add("active");
+    }, 1000);
+  }, 2500);
+
+  // Fade out THE DIRECTORY and reveal the website
+  setTimeout(function () {
+    stageTwo.classList.remove("active");
+
+    setTimeout(function () {
+      intro.classList.add("hide-intro");
+
+      document.body.classList.remove("website-loading");
+      document.body.classList.add("website-ready");
+    }, 1000);
+  }, 6000);
 });
