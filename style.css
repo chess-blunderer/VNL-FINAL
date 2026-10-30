@@ -410,3 +410,138 @@ body {
     font-size: 19px;
   }
 }
+
+/* =====================================
+   SWARIZZ CINEMATIC INTRO
+===================================== */
+
+/* FONT IMPORTS */
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@300;400;500&display=swap");
+
+/* MAIN INTRO BACKGROUND */
+#intro-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  background-color: #183b3b;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: #f1f0e8;
+
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity 1s ease,
+    visibility 1s ease;
+}
+
+/* INTRO STAGES */
+.intro-stage {
+  position: absolute;
+  width: 100%;
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition:
+    opacity 1s ease,
+    visibility 1s ease;
+}
+
+.intro-stage.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* FIRST STAGE: SWARIZZ PRESENTS */
+#stage-one h1 {
+  font-family: "Cinzel", serif;
+  font-size: clamp(2.8rem, 8vw, 4.2rem);
+  font-weight: 600;
+  letter-spacing: 5px;
+  margin: 0;
+}
+
+#stage-one p {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 5px;
+  color: #b8d0cc;
+  margin-top: 20px;
+}
+
+/* SECOND STAGE: THE DIRECTORY */
+#stage-two h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(2.8rem, 8vw, 4rem);
+  font-weight: 500;
+  letter-spacing: 2px;
+  margin: 0;
+  color: #f1f0e8;
+}
+
+#stage-two p {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 300;
+  letter-spacing: 1.8px;
+  text-align: center;
+  color: #b8d0cc;
+  margin-top: 18px;
+}
+
+/* HIDE ENTIRE INTRO */
+#intro-screen.hide-intro {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* =====================================
+   MAIN WEBSITE FADE-IN
+===================================== */
+
+body.website-loading > *:not(#intro-screen):not(#creator-credit) {
+  opacity: 0;
+}
+
+body.website-ready > *:not(#intro-screen):not(#creator-credit) {
+  opacity: 1;
+  transition: opacity 1.2s ease;
+}
+
+/* =====================================
+   PERMANENT SWARIZZ SIGNATURE
+===================================== */
+
+#creator-credit {
+  position: fixed;
+  bottom: 15px;
+  right: 20px;
+  z-index: 100000;
+
+  font-family: "Cinzel", serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  pointer-events: none;
+  user-select: none;
+}
+
