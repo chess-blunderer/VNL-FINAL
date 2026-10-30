@@ -239,6 +239,7 @@ body {
     1fr
     1fr
     1fr
+    1fr
     1fr;
 
   /*
@@ -323,10 +324,6 @@ body {
   background-color: white;
 
   border-bottom: 1px solid rgba(47, 79, 79, 0.14);
-}
-
-.row:last-child {
-  border-bottom: none;
 }
 
 /* =========================================
@@ -544,4 +541,3 @@ body.website-ready > *:not(#intro-screen):not(#creator-credit) {
   pointer-events: none;
   user-select: none;
 }
-
